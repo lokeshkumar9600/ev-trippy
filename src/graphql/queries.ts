@@ -241,3 +241,44 @@ export const GET_STATION = gql`
     }
   }
 `;
+
+
+export const GET_STATIONS_AROUND = gql`
+  query GetStationsAround(
+    $filter: StationAroundFilter!
+    $size: Int
+    $page: Int
+  ) {
+    stationAround(
+      filter: $filter
+      size: $size
+      page: $page
+    ) {
+      id
+      external_id
+      name
+
+      location {
+        type
+        coordinates
+      }
+
+      elevation
+
+      physical_address {
+        continent
+        country
+        county
+        city
+        street
+        number
+        postal_code
+        what_3_words
+        formatted_address
+      }
+
+      amenities
+      power
+    }
+  }
+`;
