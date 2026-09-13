@@ -63,53 +63,49 @@ function TripPlanner() {
   const vehicle = data?.vehicle;
 
   const handlePlanJourney = async () => {
-  if (!vehicleId || !origin || !destination) return;
+    if (!vehicleId || !origin || !destination) return;
 
-  try {
-    const [originCoordinates, destinationCoordinates] =
-      await Promise.all([
-        geocodeLocation(origin),
-        geocodeLocation(destination),
-      ]);
+    try {
+      const [originCoordinates, destinationCoordinates] = await Promise.all(
+        [geocodeLocation(origin), geocodeLocation(destination)],
+      );
 
-    if (!originCoordinates) {
-      console.error("Could not find origin:", origin);
-      return;
+      if (!originCoordinates) {
+        console.error("Could not find origin:", origin);
+        return;
+      }
+
+      if (!destinationCoordinates) {
+        console.error("Could not find destination:", destination);
+        return;
+      }
+
+      console.log("Origin coordinates:", originCoordinates);
+      console.log("Destination coordinates:", destinationCoordinates);
+
+      const result = await createRoute({
+        variables: {
+          vehicleId,
+          originName: origin,
+          originLongitude: originCoordinates.longitude,
+          originLatitude: originCoordinates.latitude,
+          destinationName: destination,
+          destinationLongitude: destinationCoordinates.longitude,
+          destinationLatitude: destinationCoordinates.latitude,
+        },
+      });
+
+      const newRouteId = result.data?.createRoute;
+
+      if (newRouteId) {
+        setRouteId(newRouteId);
+      }
+
+      console.log("Route created:", newRouteId);
+    } catch (error) {
+      console.error("Failed to create route:", error);
     }
-
-    if (!destinationCoordinates) {
-      console.error("Could not find destination:", destination);
-      return;
-    }
-
-    console.log("Origin coordinates:", originCoordinates);
-    console.log("Destination coordinates:", destinationCoordinates);
-
-    const result = await createRoute({
-      variables: {
-        vehicleId,
-
-        originName: origin,
-        originLongitude: originCoordinates.longitude,
-        originLatitude: originCoordinates.latitude,
-
-        destinationName: destination,
-        destinationLongitude: destinationCoordinates.longitude,
-        destinationLatitude: destinationCoordinates.latitude,
-      },
-    });
-
-    const newRouteId = result.data?.createRoute;
-
-    if (newRouteId) {
-      setRouteId(newRouteId);
-    }
-
-    console.log("Route created:", newRouteId);
-  } catch (error) {
-    console.error("Failed to create route:", error);
-  }
-};
+  };
 
   return (
     <Container size="xl" py="md">
@@ -133,8 +129,7 @@ function TripPlanner() {
             <Text c="dimmed">
               {vehicle.naming?.make} {vehicle.naming?.model}
               {" · "}
-              {vehicle.naming?.chargetrip_version ||
-                "Version not specified"}
+              {vehicle.naming?.chargetrip_version || "Version not specified"}
             </Text>
           ) : (
             <Text c="red">Vehicle not found.</Text>
@@ -146,7 +141,6 @@ function TripPlanner() {
             <Stack gap="md">
               <div>
                 <Text fw={600}>Trip details</Text>
-
                 <Text size="sm" c="dimmed" mt="xs">
                   Enter your starting point and destination.
                 </Text>
@@ -179,28 +173,16 @@ function TripPlanner() {
                 Plan journey
               </Button>
 
-              {routeLoading && (
-                <Text c="dimmed">
-                  Creating route...
-                </Text>
-              )}
+              {routeLoading && <Text c="dimmed">Creating route...</Text>}
 
               {routeQueryLoading && (
-                <Text c="dimmed">
-                  Calculating route...
-                </Text>
+                <Text c="dimmed">Calculating route...</Text>
               )}
 
-              {routeError && (
-                <Text c="red">
-                  Failed to create route.
-                </Text>
-              )}
+              {routeError && <Text c="red">Failed to create route.</Text>}
 
               {routeQueryError && (
-                <Text c="red">
-                  Failed to fetch route.
-                </Text>
+                <Text c="red">Failed to fetch route.</Text>
               )}
 
               {routeData?.getRoute && (
@@ -221,8 +203,7 @@ function TripPlanner() {
                         <Text size="sm">
                           Distance:{" "}
                           {Math.round(
-                            routeData.getRoute.recommended.distance /
-                              1000,
+                            routeData.getRoute.recommended.distance / 1000,
                           )}{" "}
                           km
                         </Text>
@@ -230,8 +211,8 @@ function TripPlanner() {
                         <Text size="sm">
                           Duration:{" "}
                           {Math.round(
-                            routeData.getRoute.recommended.durations
-                              .total / 3600,
+                            routeData.getRoute.recommended.durations.total /
+                              3600,
                           )}{" "}
                           hours
                         </Text>
@@ -248,7 +229,14 @@ function TripPlanner() {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 8 }}>
-            <MapView />
+            <MapView
+              routePolyline={
+                routeData?.getRoute?.recommended?.polyline ?? null
+              }
+              routeLegs={
+                routeData?.getRoute?.recommended?.legs ?? []
+              }
+            />
           </Grid.Col>
         </Grid>
       </Stack>
