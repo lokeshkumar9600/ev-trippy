@@ -6,9 +6,7 @@ export type Coordinates = {
 export function getUserLocation(): Promise<Coordinates> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(
-        new Error("Geolocation is not supported by this browser."),
-      );
+      reject(new Error("Geolocation is not supported by this browser."));
       return;
     }
 

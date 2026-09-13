@@ -2,22 +2,9 @@ import { useQuery, skipToken, useMutation } from "@apollo/client/react";
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  Container,
-  Stack,
-  Title,
-  Text,
-  Button,
-  Grid,
-  TextInput,
-} from "@mantine/core";
+import { Container, Stack, Title, Text, Button, Grid, TextInput } from "@mantine/core";
 
-import {
-  CREATE_ROUTE,
-  GET_VEHICLE_DETAILS,
-  GET_ROUTE,
-  GET_STATION
-} from "../graphql/queries";
+import { CREATE_ROUTE, GET_VEHICLE_DETAILS, GET_ROUTE, GET_STATION } from "../graphql/queries";
 
 import MapView from "../components/MapView";
 import { geocodeLocation } from "../lib/geocoding";
@@ -32,8 +19,7 @@ function TripPlanner() {
 
   const routeStatusRef = useRef<string | null>(null);
 
-  const [createRoute, { loading: routeLoading, error: routeError }] =
-    useMutation(CREATE_ROUTE);
+  const [createRoute, { loading: routeLoading, error: routeError }] = useMutation(CREATE_ROUTE);
 
   const {
     data: routeData,
@@ -51,24 +37,23 @@ function TripPlanner() {
   );
 
   const stationId =
-  routeData?.getRoute?.recommended?.legs?.find(
-    (leg: any) => leg.station?.station_id,
-  )?.station?.station_id ?? null;
+    routeData?.getRoute?.recommended?.legs?.find((leg: any) => leg.station?.station_id)?.station
+      ?.station_id ?? null;
 
   const {
-  data: stationData,
-  loading: stationLoading,
-  error: stationError,
-} = useQuery(
-  GET_STATION,
-  stationId
-    ? {
-        variables: { stationId },
-      }
-    : skipToken,
-);
+    data: stationData,
+    loading: stationLoading,
+    error: stationError,
+  } = useQuery(
+    GET_STATION,
+    stationId
+      ? {
+          variables: { stationId },
+        }
+      : skipToken,
+  );
 
-const station = stationData?.station;
+  const station = stationData?.station;
 
   routeStatusRef.current = routeData?.getRoute?.status ?? null;
 
@@ -87,9 +72,10 @@ const station = stationData?.station;
     if (!vehicleId || !origin || !destination) return;
 
     try {
-      const [originCoordinates, destinationCoordinates] = await Promise.all(
-        [geocodeLocation(origin), geocodeLocation(destination)],
-      );
+      const [originCoordinates, destinationCoordinates] = await Promise.all([
+        geocodeLocation(origin),
+        geocodeLocation(destination),
+      ]);
 
       if (!originCoordinates) {
         console.error("Could not find origin:", origin);
@@ -131,11 +117,7 @@ const station = stationData?.station;
   return (
     <Container size="xl" py="md">
       <Stack gap="xl">
-        <Button
-          variant="subtle"
-          onClick={() => navigate("/")}
-          style={{ alignSelf: "flex-start" }}
-        >
+        <Button variant="subtle" onClick={() => navigate("/")} style={{ alignSelf: "flex-start" }}>
           ← Back to vehicles
         </Button>
 
@@ -171,18 +153,14 @@ const station = stationData?.station;
                 label="From"
                 placeholder="e.g. London"
                 value={origin}
-                onChange={(event) =>
-                  setOrigin(event.currentTarget.value)
-                }
+                onChange={(event) => setOrigin(event.currentTarget.value)}
               />
 
               <TextInput
                 label="To"
                 placeholder="e.g. Birmingham"
                 value={destination}
-                onChange={(event) =>
-                  setDestination(event.currentTarget.value)
-                }
+                onChange={(event) => setDestination(event.currentTarget.value)}
               />
 
               <Button
@@ -196,21 +174,15 @@ const station = stationData?.station;
 
               {routeLoading && <Text c="dimmed">Creating route...</Text>}
 
-              {routeQueryLoading && (
-                <Text c="dimmed">Calculating route...</Text>
-              )}
+              {routeQueryLoading && <Text c="dimmed">Calculating route...</Text>}
 
               {routeError && <Text c="red">Failed to create route.</Text>}
 
-              {routeQueryError && (
-                <Text c="red">Failed to fetch route.</Text>
-              )}
+              {routeQueryError && <Text c="red">Failed to fetch route.</Text>}
 
               {routeData?.getRoute && (
                 <Stack gap="xs">
-                  <Text fw={600}>
-                    Route status: {routeData.getRoute.status}
-                  </Text>
+                  <Text fw={600}>Route status: {routeData.getRoute.status}</Text>
 
                   {routeData.getRoute.status === "processing" && (
                     <Text size="sm" c="dimmed">
@@ -218,32 +190,22 @@ const station = stationData?.station;
                     </Text>
                   )}
 
-                  {routeData.getRoute.status === "done" &&
-                    routeData.getRoute.recommended && (
-                      <>
-                        <Text size="sm">
-                          Distance:{" "}
-                          {Math.round(
-                            routeData.getRoute.recommended.distance / 1000,
-                          )}{" "}
-                          km
-                        </Text>
+                  {routeData.getRoute.status === "done" && routeData.getRoute.recommended && (
+                    <>
+                      <Text size="sm">
+                        Distance: {Math.round(routeData.getRoute.recommended.distance / 1000)} km
+                      </Text>
 
-                        <Text size="sm">
-                          Duration:{" "}
-                          {Math.round(
-                            routeData.getRoute.recommended.durations.total /
-                              3600,
-                          )}{" "}
-                          hours
-                        </Text>
+                      <Text size="sm">
+                        Duration:{" "}
+                        {Math.round(routeData.getRoute.recommended.durations.total / 3600)} hours
+                      </Text>
 
-                        <Text size="sm">
-                          Charging stops:{" "}
-                          {routeData.getRoute.recommended.charges}
-                        </Text>
-                      </>
-                    )}
+                      <Text size="sm">
+                        Charging stops: {routeData.getRoute.recommended.charges}
+                      </Text>
+                    </>
+                  )}
                 </Stack>
               )}
             </Stack>
@@ -251,12 +213,8 @@ const station = stationData?.station;
 
           <Grid.Col span={{ base: 12, md: 8 }}>
             <MapView
-              routePolyline={
-                routeData?.getRoute?.recommended?.polyline ?? null
-              }
-              routeLegs={
-                routeData?.getRoute?.recommended?.legs ?? []
-              }
+              routePolyline={routeData?.getRoute?.recommended?.polyline ?? null}
+              routeLegs={routeData?.getRoute?.recommended?.legs ?? []}
             />
           </Grid.Col>
         </Grid>

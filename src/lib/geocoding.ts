@@ -3,9 +3,7 @@ type Coordinates = {
   latitude: number;
 };
 
-export async function geocodeLocation(
-  query: string,
-): Promise<Coordinates | null> {
+export async function geocodeLocation(query: string): Promise<Coordinates | null> {
   const token = import.meta.env.VITE_MAPBOX_TOKEN;
 
   const response = await fetch(
@@ -20,8 +18,7 @@ export async function geocodeLocation(
 
   const data = await response.json();
 
-  const coordinates =
-    data.features?.[0]?.geometry?.coordinates;
+  const coordinates = data.features?.[0]?.geometry?.coordinates;
 
   if (!coordinates) {
     return null;

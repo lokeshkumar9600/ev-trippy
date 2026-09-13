@@ -19,17 +19,9 @@ import {
   Alert,
   Divider,
 } from "@mantine/core";
-import {
-  IconBolt,
-  IconMapPin,
-  IconSearch,
-  IconArrowRight,
-} from "@tabler/icons-react";
+import { IconBolt, IconMapPin, IconSearch, IconArrowRight } from "@tabler/icons-react";
 
-import {
-  LIST_VEHICLES,
-  GET_VEHICLE_DETAILS,
-} from "../graphql/queries";
+import { LIST_VEHICLES, GET_VEHICLE_DETAILS } from "../graphql/queries";
 import VehicleCard from "../components/VehicleCard";
 import VehicleDetailsModal from "../components/VehicleDetailsModal";
 
@@ -95,12 +87,7 @@ function VehicleExplorer() {
           {/* Header */}
           <Group justify="space-between">
             <Group gap="sm">
-              <ThemeIcon
-                size={40}
-                radius="md"
-                color="green"
-                variant="filled"
-              >
+              <ThemeIcon size={40} radius="md" color="green" variant="filled">
                 <IconBolt size={22} />
               </ThemeIcon>
 
@@ -133,13 +120,7 @@ function VehicleExplorer() {
                 maxWidth: 720,
               }}
             >
-              <Text
-                size="sm"
-                fw={700}
-                c="green"
-                tt="uppercase"
-                style={{ letterSpacing: "0.08em" }}
-              >
+              <Text size="sm" fw={700} c="green" tt="uppercase" style={{ letterSpacing: "0.08em" }}>
                 Electric mobility
               </Text>
 
@@ -168,8 +149,8 @@ function VehicleExplorer() {
                   lineHeight: 1.6,
                 }}
               >
-                Plan EV-aware journeys, find charging stops and explore
-                charging stations along the way.
+                Plan EV-aware journeys, find charging stops and explore charging stations along the
+                way.
               </Text>
             </Box>
 
@@ -210,18 +191,11 @@ function VehicleExplorer() {
                 transition: "transform 150ms ease, box-shadow 150ms ease",
               }}
               onClick={() =>
-                document
-                  .getElementById("vehicles")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById("vehicles")?.scrollIntoView({ behavior: "smooth" })
               }
             >
               <Group align="flex-start" wrap="nowrap">
-                <ThemeIcon
-                  size={48}
-                  radius="md"
-                  color="green"
-                  variant="light"
-                >
+                <ThemeIcon size={48} radius="md" color="green" variant="light">
                   <IconBolt size={25} />
                 </ThemeIcon>
 
@@ -229,15 +203,10 @@ function VehicleExplorer() {
                   <Title order={3}>Plan a trip</Title>
 
                   <Text size="sm" c="dimmed" mt={6} lh={1.5}>
-                    Choose your EV and plan a route with charging stops
-                    calculated for your vehicle.
+                    Choose your EV and plan a route with charging stops calculated for your vehicle.
                   </Text>
 
-                  <Button
-                    mt="lg"
-                    color="green"
-                    rightSection={<IconArrowRight size={16} />}
-                  >
+                  <Button mt="lg" color="green" rightSection={<IconArrowRight size={16} />}>
                     Choose an EV
                   </Button>
                 </Box>
@@ -256,12 +225,7 @@ function VehicleExplorer() {
               onClick={() => navigate("/nearby")}
             >
               <Group align="flex-start" wrap="nowrap">
-                <ThemeIcon
-                  size={48}
-                  radius="md"
-                  color="blue"
-                  variant="light"
-                >
+                <ThemeIcon size={48} radius="md" color="blue" variant="light">
                   <IconMapPin size={25} />
                 </ThemeIcon>
 
@@ -269,8 +233,8 @@ function VehicleExplorer() {
                   <Title order={3}>Find charging stations</Title>
 
                   <Text size="sm" c="dimmed" mt={6} lh={1.5}>
-                    Explore charging stations near a location and check their
-                    power, availability and operator.
+                    Explore charging stations near a location and check their power, availability
+                    and operator.
                   </Text>
 
                   <Button
@@ -291,12 +255,7 @@ function VehicleExplorer() {
           {/* Vehicle Explorer */}
           <Box id="vehicles">
             <Stack gap="lg">
-              <Group
-                justify="space-between"
-                align="flex-end"
-                wrap="wrap"
-                gap="md"
-              >
+              <Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
                 <div>
                   <Text
                     size="sm"
@@ -313,8 +272,7 @@ function VehicleExplorer() {
                   </Title>
 
                   <Text size="sm" c="dimmed" mt={5}>
-                    Select a vehicle to see its specifications and plan a
-                    journey.
+                    Select a vehicle to see its specifications and plan a journey.
                   </Text>
                 </div>
 
@@ -325,9 +283,7 @@ function VehicleExplorer() {
                   placeholder="Search make or model..."
                   leftSection={<IconSearch size={17} />}
                   value={searchInput}
-                  onChange={(event) =>
-                    handleSearch(event.currentTarget.value)
-                  }
+                  onChange={(event) => handleSearch(event.currentTarget.value)}
                 />
               </Group>
 
@@ -339,8 +295,7 @@ function VehicleExplorer() {
 
               {error && (
                 <Alert color="red" title="Unable to load vehicles">
-                  Something went wrong while loading the vehicles. Please try
-                  again.
+                  Something went wrong while loading the vehicles. Please try again.
                 </Alert>
               )}
 
@@ -359,10 +314,7 @@ function VehicleExplorer() {
 
               {!loading && !error && vehicles.length > 0 && (
                 <>
-                  <SimpleGrid
-                    cols={{ base: 1, sm: 2, md: 3, xl: 4 }}
-                    spacing="lg"
-                  >
+                  <SimpleGrid cols={{ base: 1, sm: 2, md: 3, xl: 4 }} spacing="lg">
                     {vehicles.map((vehicle: any) => (
                       <VehicleCard
                         key={vehicle.id}

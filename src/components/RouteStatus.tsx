@@ -23,21 +23,13 @@ export default function RouteStatus({
 }: RouteStatusProps) {
   return (
     <Stack gap="xs">
-      {loading && (
-        <Text c="dimmed">Creating route...</Text>
-      )}
+      {loading && <Text c="dimmed">Creating route...</Text>}
 
-      {queryLoading && (
-        <Text c="dimmed">Calculating route...</Text>
-      )}
+      {queryLoading && <Text c="dimmed">Calculating route...</Text>}
 
-      {error && (
-        <Text c="red">Failed to create route.</Text>
-      )}
+      {error && <Text c="red">Failed to create route.</Text>}
 
-      {queryError && (
-        <Text c="red">Failed to fetch route.</Text>
-      )}
+      {queryError && <Text c="red">Failed to fetch route.</Text>}
 
       {status && (
         <Stack gap="xs">

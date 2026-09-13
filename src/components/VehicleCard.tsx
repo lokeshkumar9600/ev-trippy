@@ -1,13 +1,4 @@
-import {
-  Card,
-  Image,
-  Text,
-  Badge,
-  Button,
-  Stack,
-  Group,
-  Box,
-} from "@mantine/core";
+import { Card, Image, Text, Badge, Button, Stack, Group, Box } from "@mantine/core";
 import { IconArrowRight } from "@tabler/icons-react";
 
 type VehicleCardProps = {
@@ -39,8 +30,7 @@ function VehicleCard({ vehicle, onSelect }: VehicleCardProps) {
         overflow: "hidden",
         background: "white",
         height: "100%",
-        transition:
-          "transform 150ms ease, box-shadow 150ms ease",
+        transition: "transform 150ms ease, box-shadow 150ms ease",
       }}
     >
       {/* Vehicle image */}
@@ -84,17 +74,11 @@ function VehicleCard({ vehicle, onSelect }: VehicleCardProps) {
             </Text>
 
             <Text size="sm" c="dimmed" mt={5} lineClamp={1}>
-              {vehicle.naming.chargetrip_version ||
-                "Version not specified"}
+              {vehicle.naming.chargetrip_version || "Version not specified"}
             </Text>
           </div>
 
-          <Badge
-            color="green"
-            variant="light"
-            size="sm"
-            radius="sm"
-          >
+          <Badge color="green" variant="light" size="sm" radius="sm">
             Electric
           </Badge>
         </Group>

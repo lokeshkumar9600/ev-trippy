@@ -1,7 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 
-
 const httpLink = new HttpLink({
   uri: "https://api.chargetrip.io/graphql",
   headers: {
@@ -10,9 +9,7 @@ const httpLink = new HttpLink({
   },
 });
 
-
 export const apolloClient = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache(),
 });
-

@@ -18,5 +18,5 @@ createRoot(document.getElementById("root")!).render(
         </BrowserRouter>
       </MantineProvider>
     </ApolloProvider>
-  </StrictMode>
+  </StrictMode>,
 );

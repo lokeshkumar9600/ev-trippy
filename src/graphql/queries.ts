@@ -81,49 +81,23 @@ export const CREATE_ROUTE = gql`
       input: {
         vehicle: {
           id: $vehicleId
-          battery: {
-            state_of_charge: {
-              value: 42
-              type: percentage
-            }
-          }
+          battery: { state_of_charge: { value: 42, type: percentage } }
           climate: true
         }
-
         origin: {
           type: Feature
-          properties: {
-            location: {
-              name: $originName
-            }
-            vehicle: {
-              occupants: 1
-            }
-          }
-          geometry: {
-            type: Point
-            coordinates: [$originLongitude, $originLatitude]
-          }
+          properties: { location: { name: $originName }, vehicle: { occupants: 1 } }
+          geometry: { type: Point, coordinates: [$originLongitude, $originLatitude] }
         }
-
         destination: {
           type: Feature
-          properties: {
-            location: {
-              name: $destinationName
-            }
-          }
-          geometry: {
-            type: Point
-            coordinates: [$destinationLongitude, $destinationLatitude]
-          }
+          properties: { location: { name: $destinationName } }
+          geometry: { type: Point, coordinates: [$destinationLongitude, $destinationLatitude] }
         }
       }
     )
   }
 `;
-
-
 
 export const GET_ROUTE = gql`
   query GetRoute($routeId: ID!) {
@@ -201,7 +175,6 @@ export const GET_ROUTE = gql`
   }
 `;
 
-
 export const GET_STATION = gql`
   query GetStation($stationId: ID!) {
     station(id: $stationId) {
@@ -242,18 +215,9 @@ export const GET_STATION = gql`
   }
 `;
 
-
 export const GET_STATIONS_AROUND = gql`
-  query GetStationsAround(
-    $filter: StationAroundFilter!
-    $size: Int
-    $page: Int
-  ) {
-    stationAround(
-      filter: $filter
-      size: $size
-      page: $page
-    ) {
+  query GetStationsAround($filter: StationAroundFilter!, $size: Int, $page: Int) {
+    stationAround(filter: $filter, size: $size, page: $page) {
       id
       external_id
       name

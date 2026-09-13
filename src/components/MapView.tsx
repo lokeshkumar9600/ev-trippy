@@ -51,10 +51,7 @@ function MapView({
       bearing: -20,
     });
 
-    map.current.addControl(
-      new mapboxgl.NavigationControl(),
-      "top-right",
-    );
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     map.current.on("style.load", () => {
       if (!map.current) return;
@@ -92,10 +89,7 @@ function MapView({
     const drawRoute = () => {
       const coordinates = polyline
         .decode(routePolyline)
-        .map(
-          ([latitude, longitude]) =>
-            [longitude, latitude] as [number, number],
-        );
+        .map(([latitude, longitude]) => [longitude, latitude] as [number, number]);
 
       const geojson: GeoJSON.Feature<GeoJSON.LineString> = {
         type: "Feature",
@@ -107,9 +101,7 @@ function MapView({
       };
 
       if (mapInstance.getSource("route")) {
-        (
-          mapInstance.getSource("route") as mapboxgl.GeoJSONSource
-        ).setData(geojson);
+        (mapInstance.getSource("route") as mapboxgl.GeoJSONSource).setData(geojson);
       } else {
         mapInstance.addSource("route", {
           type: "geojson",
@@ -139,10 +131,7 @@ function MapView({
           (bounds, coordinate) => {
             return bounds.extend(coordinate);
           },
-          new mapboxgl.LngLatBounds(
-            coordinates[0],
-            coordinates[0],
-          ),
+          new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]),
         );
 
         mapInstance.fitBounds(bounds, {
@@ -176,8 +165,7 @@ function MapView({
 
       const stationId = leg.station.station_id;
 
-      const coordinates =
-        leg.destination?.geometry?.coordinates;
+      const coordinates = leg.destination?.geometry?.coordinates;
 
       if (!coordinates || coordinates.length < 2) return;
 
@@ -242,10 +230,7 @@ function MapView({
             fetchPolicy: "network-only",
           });
 
-          console.log(
-            "Station response:",
-            result.data,
-          );
+          console.log("Station response:", result.data);
 
           const station = result.data?.station;
 
@@ -279,11 +264,7 @@ function MapView({
                     </span>
 
                     <span>
-                      ${
-                        charger.power != null
-                          ? `${charger.power} kW`
-                          : "N/A"
-                      }
+                      ${charger.power != null ? `${charger.power} kW` : "N/A"}
                     </span>
                   </div>
                 `,
@@ -326,11 +307,7 @@ function MapView({
                       margin-bottom: 10px;
                     ">
                       ${station.address}
-                      ${
-                        station.city
-                          ? `, ${station.city}`
-                          : ""
-                      }
+                      ${station.city ? `, ${station.city}` : ""}
                     </div>
                   `
                   : ""
@@ -354,9 +331,7 @@ function MapView({
                         </span>
 
                         <strong>
-                          ${Math.max(
-                            ...Object.keys(station.power).map(Number),
-                          )} kW
+                          ${Math.max(...Object.keys(station.power).map(Number))} kW
                         </strong>
                       </div>
                     `
@@ -441,11 +416,7 @@ function MapView({
                       <strong>
                         ${station.review.rating}
                       </strong>
-                      ${
-                        station.review.count != null
-                          ? ` (${station.review.count} reviews)`
-                          : ""
-                      }
+                      ${station.review.count != null ? ` (${station.review.count} reviews)` : ""}
                     </div>
                   `
                   : ""
@@ -454,10 +425,7 @@ function MapView({
             </div>
           `;
         } catch (error) {
-          console.error(
-            "Failed to fetch station details:",
-            error,
-          );
+          console.error("Failed to fetch station details:", error);
 
           popupContainer.innerHTML = `
             <div style="

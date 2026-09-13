@@ -9,8 +9,7 @@ function App() {
     <Routes>
       <Route path="/" element={<VehicleExplorer />} />
       <Route path="/plan-trip/:vehicleId" element={<TripPlanner />} />
-      <Route path="/nearby" element={<NearbyStations />}
-      />
+      <Route path="/nearby" element={<NearbyStations />} />
     </Routes>
   );
 }
