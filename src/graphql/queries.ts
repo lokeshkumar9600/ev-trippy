@@ -130,13 +130,10 @@ export const GET_ROUTE = gql`
     getRoute(id: $routeId) {
       id
       status
-
       recommended {
         id
         charges
-
         distance(unit: meter)
-
         durations {
           total
           charging
@@ -144,15 +141,14 @@ export const GET_ROUTE = gql`
           stopover
           ferry
         }
-
         consumption
         range_at_origin(unit: kilometer)
         range_at_destination(unit: kilometer)
-
         polyline(decimals: five)
 
         legs {
           type
+
           distance(unit: meter)
 
           durations {
@@ -200,6 +196,47 @@ export const GET_ROUTE = gql`
           polyline(decimals: five)
           tags
         }
+      }
+    }
+  }
+`;
+
+
+export const GET_STATION = gql`
+  query GetStation($stationId: ID!) {
+    station(id: $stationId) {
+      id
+      name
+      address
+      city
+      country
+      parking_type
+
+      operator {
+        name
+        website
+      }
+
+      chargers {
+        standard
+        power
+        speed
+        status {
+          free
+          busy
+          unknown
+          error
+        }
+        total
+      }
+
+      power
+      speed
+      status
+
+      review {
+        rating
+        count
       }
     }
   }

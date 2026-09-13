@@ -16,6 +16,7 @@ import {
   CREATE_ROUTE,
   GET_VEHICLE_DETAILS,
   GET_ROUTE,
+  GET_STATION
 } from "../graphql/queries";
 
 import MapView from "../components/MapView";
@@ -48,6 +49,26 @@ function TripPlanner() {
         }
       : skipToken,
   );
+
+  const stationId =
+  routeData?.getRoute?.recommended?.legs?.find(
+    (leg: any) => leg.station?.station_id,
+  )?.station?.station_id ?? null;
+
+  const {
+  data: stationData,
+  loading: stationLoading,
+  error: stationError,
+} = useQuery(
+  GET_STATION,
+  stationId
+    ? {
+        variables: { stationId },
+      }
+    : skipToken,
+);
+
+const station = stationData?.station;
 
   routeStatusRef.current = routeData?.getRoute?.status ?? null;
 

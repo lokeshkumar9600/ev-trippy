@@ -2,6 +2,9 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import polyline from "@mapbox/polyline";
 
+import { apolloClient } from "../lib/apollo";
+import { GET_STATION } from "../graphql/queries";
+
 type RouteLeg = {
   type?: string;
   station?: {
@@ -54,14 +57,16 @@ function MapView({
     );
 
     map.current.on("style.load", () => {
-      map.current?.addSource("mapbox-dem", {
+      if (!map.current) return;
+
+      map.current.addSource("mapbox-dem", {
         type: "raster-dem",
         url: "mapbox://mapbox.mapbox-terrain-dem-v1",
         tileSize: 512,
         maxzoom: 14,
       });
 
-      map.current?.setTerrain({
+      map.current.setTerrain({
         source: "mapbox-dem",
         exaggeration: 1.2,
       });
@@ -76,72 +81,77 @@ function MapView({
     };
   }, []);
 
+  /*
+   * Draw route
+   */
   useEffect(() => {
     if (!map.current || !routePolyline) return;
 
     const mapInstance = map.current;
 
     const drawRoute = () => {
-  const coordinates = polyline
-    .decode(routePolyline)
-    .map(([latitude, longitude]) => [
-      longitude,
-      latitude,
-    ] as [number, number]);
+      const coordinates = polyline
+        .decode(routePolyline)
+        .map(
+          ([latitude, longitude]) =>
+            [longitude, latitude] as [number, number],
+        );
 
-  const geojson: GeoJSON.Feature<GeoJSON.LineString> = {
-    type: "Feature",
-    properties: {},
-    geometry: {
-      type: "LineString",
-      coordinates,
-    },
-  };
+      const geojson: GeoJSON.Feature<GeoJSON.LineString> = {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates,
+        },
+      };
 
-  if (mapInstance.getSource("route")) {
-    (
-      mapInstance.getSource("route") as mapboxgl.GeoJSONSource
-    ).setData(geojson);
-  } else {
-    mapInstance.addSource("route", {
-      type: "geojson",
-      data: geojson,
-    });
+      if (mapInstance.getSource("route")) {
+        (
+          mapInstance.getSource("route") as mapboxgl.GeoJSONSource
+        ).setData(geojson);
+      } else {
+        mapInstance.addSource("route", {
+          type: "geojson",
+          data: geojson,
+        });
 
-    mapInstance.addLayer({
-      id: "route",
-      type: "line",
-      source: "route",
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-width": 6,
-        "line-opacity": 0.9,
-      },
-    });
-  }
+        mapInstance.addLayer({
+          id: "route",
+          type: "line",
+          source: "route",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-width": 6,
+            "line-opacity": 0.9,
+          },
+        });
+      }
 
-  // Fit the map to the entire route
-  const bounds = coordinates.reduce(
-    (bounds, coordinate) => {
-      return bounds.extend(coordinate);
-    },
-    new mapboxgl.LngLatBounds(
-      coordinates[0],
-      coordinates[0],
-    ),
-  );
+      /*
+       * Automatically fit the map to the route
+       */
+      if (coordinates.length > 0) {
+        const bounds = coordinates.reduce(
+          (bounds, coordinate) => {
+            return bounds.extend(coordinate);
+          },
+          new mapboxgl.LngLatBounds(
+            coordinates[0],
+            coordinates[0],
+          ),
+        );
 
-  mapInstance.fitBounds(bounds, {
-    padding: 80,
-    duration: 1200,
-    maxZoom: 12,
-  });
-};
-
-     
+        mapInstance.fitBounds(bounds, {
+          padding: 80,
+          duration: 1200,
+          maxZoom: 12,
+        });
+      }
+    };
 
     if (mapInstance.isStyleLoaded()) {
       drawRoute();
@@ -150,17 +160,21 @@ function MapView({
     }
   }, [routePolyline]);
 
+  /*
+   * Charging station markers
+   */
   useEffect(() => {
     if (!map.current || routeLegs.length === 0) return;
 
     const mapInstance = map.current;
 
-    // Remove old markers
     markers.current.forEach((marker) => marker.remove());
     markers.current = [];
 
     routeLegs.forEach((leg) => {
-      if (!leg.station) return;
+      if (!leg.station?.station_id) return;
+
+      const stationId = leg.station.station_id;
 
       const coordinates =
         leg.destination?.geometry?.coordinates;
@@ -169,9 +183,13 @@ function MapView({
 
       const [longitude, latitude] = coordinates;
 
+      /*
+       * Create charging marker
+       */
       const element = document.createElement("div");
 
       element.innerHTML = "⚡";
+
       element.style.width = "38px";
       element.style.height = "38px";
       element.style.borderRadius = "50%";
@@ -184,14 +202,288 @@ function MapView({
       element.style.border = "2px solid #228be6";
       element.style.cursor = "pointer";
 
+      /*
+       * Create popup container
+       */
+      const popupContainer = document.createElement("div");
+
+      popupContainer.style.width = "280px";
+      popupContainer.style.padding = "4px";
+
+      popupContainer.innerHTML = `
+        <div style="font-family: system-ui, sans-serif;">
+          <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">
+            Charging station
+          </div>
+
+          <div style="font-size: 13px; color: #666;">
+            Loading station details...
+          </div>
+        </div>
+      `;
+
       const popup = new mapboxgl.Popup({
         offset: 25,
-      }).setHTML(`
-        <strong>Charging stop</strong>
-        <br />
-        ${leg.destination?.properties?.name ?? "EV charging station"}
-      `);
+        maxWidth: "320px",
+      }).setDOMContent(popupContainer);
 
+      /*
+       * Fetch station details when popup opens
+       */
+      popup.on("open", async () => {
+        console.log("Fetching station:", stationId);
+
+        try {
+          const result = await apolloClient.query({
+            query: GET_STATION,
+            variables: {
+              stationId,
+            },
+            fetchPolicy: "network-only",
+          });
+
+          console.log(
+            "Station response:",
+            result.data,
+          );
+
+          const station = result.data?.station;
+
+          if (!station) {
+            popupContainer.innerHTML = `
+              <div style="font-family: system-ui, sans-serif;">
+                <div style="font-weight: 700; margin-bottom: 6px;">
+                  Charging station
+                </div>
+
+                <div style="font-size: 13px; color: #d63939;">
+                  Station details unavailable.
+                </div>
+              </div>
+            `;
+
+            return;
+          }
+
+          const chargers =
+            station.chargers
+              ?.map(
+                (charger: any) => `
+                  <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 4px;
+                  ">
+                    <span>
+                      ${charger.standard || "Unknown"}
+                    </span>
+
+                    <span>
+                      ${
+                        charger.power != null
+                          ? `${charger.power} kW`
+                          : "N/A"
+                      }
+                    </span>
+                  </div>
+                `,
+              )
+              .join("") || "";
+
+          popupContainer.innerHTML = `
+            <div style="
+              font-family: system-ui, sans-serif;
+              color: #212529;
+            ">
+
+              <div style="
+                font-size: 17px;
+                font-weight: 700;
+                margin-bottom: 4px;
+              ">
+                ${station.name || "Charging station"}
+              </div>
+
+              ${
+                station.operator?.name
+                  ? `
+                    <div style="
+                      font-size: 13px;
+                      color: #666;
+                      margin-bottom: 10px;
+                    ">
+                      ${station.operator.name}
+                    </div>
+                  `
+                  : ""
+              }
+
+              ${
+                station.address
+                  ? `
+                    <div style="
+                      font-size: 13px;
+                      margin-bottom: 10px;
+                    ">
+                      ${station.address}
+                      ${
+                        station.city
+                          ? `, ${station.city}`
+                          : ""
+                      }
+                    </div>
+                  `
+                  : ""
+              }
+
+              <div style="
+                border-top: 1px solid #eee;
+                padding-top: 10px;
+              ">
+
+                ${
+                  station.power
+                    ? `
+                      <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 6px;
+                      ">
+                        <span style="color: #666;">
+                          Max power
+                        </span>
+
+                        <strong>
+                          ${Math.max(
+                            ...Object.keys(station.power).map(Number),
+                          )} kW
+                        </strong>
+                      </div>
+                    `
+                    : ""
+                }
+
+                ${
+                  station.speed
+                    ? `
+                      <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 6px;
+                      ">
+                        <span style="color: #666;">
+                          Speed
+                        </span>
+
+                        <strong>
+                          ${station.speed}
+                        </strong>
+                      </div>
+                    `
+                    : ""
+                }
+
+                ${
+                  station.status
+                    ? `
+                      <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 8px;
+                      ">
+                        <span style="color: #666;">
+                          Status
+                        </span>
+
+                        <strong>
+                          ${station.status}
+                        </strong>
+                      </div>
+                    `
+                    : ""
+                }
+
+              </div>
+
+              ${
+                chargers
+                  ? `
+                    <div style="
+                      border-top: 1px solid #eee;
+                      padding-top: 10px;
+                      margin-top: 8px;
+                    ">
+
+                      <div style="
+                        font-weight: 600;
+                        margin-bottom: 6px;
+                      ">
+                        Chargers
+                      </div>
+
+                      ${chargers}
+
+                    </div>
+                  `
+                  : ""
+              }
+
+              ${
+                station.review?.rating != null
+                  ? `
+                    <div style="
+                      border-top: 1px solid #eee;
+                      padding-top: 10px;
+                      margin-top: 10px;
+                      font-size: 13px;
+                    ">
+                      Rating:
+                      <strong>
+                        ${station.review.rating}
+                      </strong>
+                      ${
+                        station.review.count != null
+                          ? ` (${station.review.count} reviews)`
+                          : ""
+                      }
+                    </div>
+                  `
+                  : ""
+              }
+
+            </div>
+          `;
+        } catch (error) {
+          console.error(
+            "Failed to fetch station details:",
+            error,
+          );
+
+          popupContainer.innerHTML = `
+            <div style="
+              font-family: system-ui, sans-serif;
+            ">
+              <div style="
+                font-weight: 700;
+                margin-bottom: 6px;
+              ">
+                Charging station
+              </div>
+
+              <div style="
+                font-size: 13px;
+                color: #d63939;
+              ">
+                Failed to load station details.
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      /*
+       * Create marker
+       */
       const marker = new mapboxgl.Marker({
         element,
       })
