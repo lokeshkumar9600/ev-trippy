@@ -19,7 +19,12 @@ type VehicleDetailsModalProps = {
   onPlanTrip: () => void;
 };
 
-function VehicleDetailsModal({ opened, onClose, vehicle, onPlanTrip }: VehicleDetailsModalProps) {
+function VehicleDetailsModal({
+  opened,
+  onClose,
+  vehicle,
+  onPlanTrip,
+}: VehicleDetailsModalProps) {
   if (!vehicle) {
     return null;
   }
@@ -28,7 +33,6 @@ function VehicleDetailsModal({ opened, onClose, vehicle, onPlanTrip }: VehicleDe
 
   const batteryKwh = vehicle.battery?.usable_kwh;
   const rangeBest = vehicle.range?.best;
-  const rangeWorst = vehicle.range?.worst;
   const routing = vehicle.routing;
   const connectors = vehicle.connectors;
   const perf = vehicle.performance;
@@ -63,38 +67,28 @@ function VehicleDetailsModal({ opened, onClose, vehicle, onPlanTrip }: VehicleDe
 
         {/* Battery & Range */}
         <Paper withBorder p="md" radius="md">
-          <Title order={4} mb="xs">
-            Battery & Range
-          </Title>
+          <Title order={4} mb="xs">Battery & Range</Title>
           <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs">
             <div>
-              <Text size="xs" c="dimmed">
-                Usable battery
-              </Text>
+              <Text size="xs" c="dimmed">Usable battery</Text>
               <Text fw={600} size="sm">
                 {batteryKwh != null ? `${batteryKwh} kWh` : "N/A"}
               </Text>
             </div>
             <div>
-              <Text size="xs" c="dimmed">
-                Combined range
-              </Text>
+              <Text size="xs" c="dimmed">Combined range</Text>
               <Text fw={600} size="sm">
                 {rangeBest?.combined != null ? `${rangeBest.combined} km` : "N/A"}
               </Text>
             </div>
             <div>
-              <Text size="xs" c="dimmed">
-                City range
-              </Text>
+              <Text size="xs" c="dimmed">City range</Text>
               <Text fw={600} size="sm">
                 {rangeBest?.city != null ? `${rangeBest.city} km` : "N/A"}
               </Text>
             </div>
             <div>
-              <Text size="xs" c="dimmed">
-                Highway range
-              </Text>
+              <Text size="xs" c="dimmed">Highway range</Text>
               <Text fw={600} size="sm">
                 {rangeBest?.highway != null ? `${rangeBest.highway} km` : "N/A"}
               </Text>
@@ -106,22 +100,16 @@ function VehicleDetailsModal({ opened, onClose, vehicle, onPlanTrip }: VehicleDe
 
         {/* Performance */}
         <Paper withBorder p="md" radius="md">
-          <Title order={4} mb="xs">
-            Performance
-          </Title>
+          <Title order={4} mb="xs">Performance</Title>
           <SimpleGrid cols={{ base: 2, sm: 2 }} spacing="xs">
             <div>
-              <Text size="xs" c="dimmed">
-                Top speed
-              </Text>
+              <Text size="xs" c="dimmed">Top speed</Text>
               <Text fw={600} size="sm">
                 {perf?.top_speed != null ? `${perf.top_speed} km/h` : "N/A"}
               </Text>
             </div>
             <div>
-              <Text size="xs" c="dimmed">
-                Acceleration
-              </Text>
+              <Text size="xs" c="dimmed">Acceleration</Text>
               <Text fw={600} size="sm">
                 {perf?.acceleration != null ? `${perf.acceleration} s` : "N/A"}
               </Text>
@@ -133,22 +121,19 @@ function VehicleDetailsModal({ opened, onClose, vehicle, onPlanTrip }: VehicleDe
 
         {/* Charging */}
         <Paper withBorder p="md" radius="md">
-          <Title order={4} mb="xs">
-            Charging
-          </Title>
+          <Title order={4} mb="xs">Charging</Title>
           <Stack gap="xs">
             <Group justify="space-between">
-              <Text size="xs" c="dimmed">
-                Fast charging
-              </Text>
-              <Badge color={routing?.fast_charging_support ? "green" : "gray"} variant="light">
+              <Text size="xs" c="dimmed">Fast charging</Text>
+              <Badge
+                color={routing?.fast_charging_support ? "green" : "gray"}
+                variant="light"
+              >
                 {routing?.fast_charging_support ? "Supported" : "Not supported"}
               </Badge>
             </Group>
             <div>
-              <Text size="xs" c="dimmed">
-                Connectors
-              </Text>
+              <Text size="xs" c="dimmed">Connectors</Text>
               <Text fw={600} size="sm">
                 {connectors
                   ?.map((c: any) => c.standard)

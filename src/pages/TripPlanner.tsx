@@ -37,14 +37,10 @@ function TripPlanner() {
   );
 
   const stationId =
-    routeData?.getRoute?.recommended?.legs?.find((leg: any) => leg.station?.station_id)?.station
+    (routeData as any)?.getRoute?.recommended?.legs?.find((leg: any) => leg.station?.station_id)?.station
       ?.station_id ?? null;
 
-  const {
-    data: stationData,
-    loading: stationLoading,
-    error: stationError,
-  } = useQuery(
+  useQuery(
     GET_STATION,
     stationId
       ? {
@@ -53,9 +49,7 @@ function TripPlanner() {
       : skipToken,
   );
 
-  const station = stationData?.station;
-
-  routeStatusRef.current = routeData?.getRoute?.status ?? null;
+  routeStatusRef.current = (routeData as any)?.getRoute?.status ?? null;
 
   const { data, loading, error } = useQuery(
     GET_VEHICLE_DETAILS,
@@ -66,7 +60,7 @@ function TripPlanner() {
       : skipToken,
   );
 
-  const vehicle = data?.vehicle;
+  const vehicle = (data as any)?.vehicle;
 
   const handlePlanJourney = async () => {
     if (!vehicleId || !origin || !destination) return;
@@ -87,8 +81,6 @@ function TripPlanner() {
         return;
       }
 
-      console.log("Origin coordinates:", originCoordinates);
-      console.log("Destination coordinates:", destinationCoordinates);
 
       const result = await createRoute({
         variables: {
@@ -102,13 +94,12 @@ function TripPlanner() {
         },
       });
 
-      const newRouteId = result.data?.createRoute;
+      const newRouteId = (result.data as any)?.createRoute;
 
       if (newRouteId) {
         setRouteId(newRouteId);
       }
 
-      console.log("Route created:", newRouteId);
     } catch (error) {
       console.error("Failed to create route:", error);
     }
@@ -139,7 +130,7 @@ function TripPlanner() {
           )}
         </div>
 
-        <Grid gutter="lg">
+        <Grid>
           <Grid.Col span={{ base: 12, md: 4 }}>
             <Stack gap="md">
               <div>
@@ -180,29 +171,29 @@ function TripPlanner() {
 
               {routeQueryError && <Text c="red">Failed to fetch route.</Text>}
 
-              {routeData?.getRoute && (
+              {(routeData as any)?.getRoute && (
                 <Stack gap="xs">
-                  <Text fw={600}>Route status: {routeData.getRoute.status}</Text>
+                  <Text fw={600}>Route status: {(routeData as any).getRoute.status}</Text>
 
-                  {routeData.getRoute.status === "processing" && (
+                  {(routeData as any).getRoute.status === "processing" && (
                     <Text size="sm" c="dimmed">
                       We're calculating the best route for your EV...
                     </Text>
                   )}
 
-                  {routeData.getRoute.status === "done" && routeData.getRoute.recommended && (
+                  {(routeData as any).getRoute.status === "done" && (routeData as any).getRoute.recommended && (
                     <>
                       <Text size="sm">
-                        Distance: {Math.round(routeData.getRoute.recommended.distance / 1000)} km
+                        Distance: {Math.round((routeData as any).getRoute.recommended.distance / 1000)} km
                       </Text>
 
                       <Text size="sm">
                         Duration:{" "}
-                        {Math.round(routeData.getRoute.recommended.durations.total / 3600)} hours
+                        {Math.round((routeData as any).getRoute.recommended.durations.total / 3600)} hours
                       </Text>
 
                       <Text size="sm">
-                        Charging stops: {routeData.getRoute.recommended.charges}
+                        Charging stops: {(routeData as any).getRoute.recommended.charges}
                       </Text>
                     </>
                   )}
@@ -213,8 +204,8 @@ function TripPlanner() {
 
           <Grid.Col span={{ base: 12, md: 8 }}>
             <MapView
-              routePolyline={routeData?.getRoute?.recommended?.polyline ?? null}
-              routeLegs={routeData?.getRoute?.recommended?.legs ?? []}
+              routePolyline={(routeData as any)?.getRoute?.recommended?.polyline ?? null}
+              routeLegs={(routeData as any)?.getRoute?.recommended?.legs ?? []}
             />
           </Grid.Col>
         </Grid>

@@ -1,6 +1,4 @@
-import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
-import { ApolloProvider } from "@apollo/client/react";
-
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 const httpLink = new HttpLink({
   uri: "https://api.chargetrip.io/graphql",
   headers: {

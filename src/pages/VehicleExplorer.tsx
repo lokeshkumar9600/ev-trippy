@@ -43,13 +43,13 @@ function VehicleExplorer() {
     },
   });
 
-  const vehicles = data?.vehicleList ?? [];
+  const vehicles = (data as any)?.vehicleList ?? [];
   const hasNextPage = vehicles.length === pageSize;
 
   const {
     data: vehicleDetailsData,
-    loading: vehicleDetailsLoading,
-    error: vehicleDetailsError,
+    // loading: vehicleDetailsLoading,
+    // error: vehicleDetailsError,
   } = useQuery(
     GET_VEHICLE_DETAILS,
     selectedVehicle
@@ -61,7 +61,7 @@ function VehicleExplorer() {
       : skipToken,
   );
 
-  const selectedVehicleDetails = vehicleDetailsData?.vehicle;
+  const selectedVehicleDetails = (vehicleDetailsData as any)?.vehicle;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -83,7 +83,7 @@ function VehicleExplorer() {
       }}
     >
       <Container size="xl" py={{ base: 24, sm: 36 }}>
-        <Stack gap={{ base: 32, sm: 44 }}>
+        <Stack gap={{ base: 32, sm: 44 } as any}>
           {/* Header */}
           <Group justify="space-between">
             <Group gap="sm">

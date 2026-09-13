@@ -219,7 +219,6 @@ function MapView({
        * Fetch station details when popup opens
        */
       popup.on("open", async () => {
-        console.log("Fetching station:", stationId);
 
         try {
           const result = await apolloClient.query({
@@ -230,9 +229,8 @@ function MapView({
             fetchPolicy: "network-only",
           });
 
-          console.log("Station response:", result.data);
 
-          const station = result.data?.station;
+          const station = (result.data as any)?.station;
 
           if (!station) {
             popupContainer.innerHTML = `
