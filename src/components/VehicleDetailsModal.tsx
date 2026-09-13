@@ -184,4 +184,3 @@ function VehicleDetailsModal({
 }
 
 export default VehicleDetailsModal;
-

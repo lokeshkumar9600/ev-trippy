@@ -1,69 +1,68 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const LIST_VEHICLES = gql`
   query ListVehicles($page: Int, $size: Int, $search: String) {
-  vehicleList( page: $page size: $size search: $search) {
-    id
-    naming {
-      make
-      model
-      chargetrip_version
-    }
-    media {
-      image {
-        thumbnail_url
+    vehicleList(page: $page, size: $size, search: $search) {
+      id
+      naming {
+        make
+        model
+        chargetrip_version
+      }
+      media {
+        image {
+          thumbnail_url
+        }
       }
     }
   }
-}
 `;
 
-
 export const GET_VEHICLE_DETAILS = gql`
-    query GetVehicleDetails($vehicleId: ID!){ 
+  query GetVehicleDetails($vehicleId: ID!) {
     vehicle(id: $vehicleId) {
-    naming {
-      make
-      model
-      chargetrip_version
-    }
-    media {
-      image {
-        url
+      naming {
+        make
+        model
+        chargetrip_version
       }
-      brand {
-        thumbnail_url
+      media {
+        image {
+          url
+        }
+        brand {
+          thumbnail_url
+        }
       }
-    }
-    battery {
-      usable_kwh
-    }
-    range {
-      best {
-        highway
-        city
-        combined
+      battery {
+        usable_kwh
       }
-      worst {
-        highway
-        city
-        combined
+      range {
+        best {
+          highway
+          city
+          combined
+        }
+        worst {
+          highway
+          city
+          combined
+        }
+        chargetrip_range {
+          best
+          worst
+        }
       }
-      chargetrip_range {
-        best
-        worst
+      routing {
+        fast_charging_support
       }
-    }
-    routing {
-      fast_charging_support
-    }
-    connectors {
-      standard
-    }
-    performance {
-      acceleration
-      top_speed
+      connectors {
+        standard
+      }
+      performance {
+        acceleration
+        top_speed
+      }
     }
   }
-    }
-`; 
+`;

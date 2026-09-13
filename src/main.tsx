@@ -1,18 +1,22 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import { ApolloProvider } from "@apollo/client/react";
-import { apolloClient } from './lib/apollo.ts';
-import './index.css'
+import { apolloClient } from "./lib/apollo.ts";
+import { BrowserRouter } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-import App from './App.tsx'
+import "mapbox-gl/dist/mapbox-gl.css";
+import App from "./App.tsx";
+import "./index.css";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-     <MantineProvider>
-        <ApolloProvider client={apolloClient}>
-      <App />
+    <ApolloProvider client={apolloClient}>
+      <MantineProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </MantineProvider>
     </ApolloProvider>
-     </MantineProvider>
-  </StrictMode>,
-)
+  </StrictMode>
+);
