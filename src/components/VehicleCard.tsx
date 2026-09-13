@@ -6,9 +6,10 @@ type VehicleCardProps = {
     naming: { make: string; model: string; version: string | null; };
     media: { image: { thumbnail_url: string | null; } | null; };
   };
+  onSelect: ()=> void;
 };
 
-function VehicleCard({ vehicle }: VehicleCardProps) {
+function VehicleCard({ vehicle , onSelect }: VehicleCardProps) {
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
     {vehicle.media?.image?.thumbnail_url && (
@@ -35,7 +36,7 @@ function VehicleCard({ vehicle }: VehicleCardProps) {
       {vehicle.naming.version || "Version not specified"}
     </Text>
 
-    <Button fullWidth mt="md" radius="md">
+    <Button fullWidth mt="md" radius="md" onClick={onSelect}>
       View vehicle
     </Button>
   </Card>

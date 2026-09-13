@@ -1,38 +1,69 @@
 import { gql } from '@apollo/client';
 
 export const LIST_VEHICLES = gql`
-  query ListVehicles {
-    vehicleList(size: 9, page: 0) {
-      id
-
-      naming {
-        make
-        model
-        version
-        edition
-      }
-
-      connectors {
-        standard
-      }
-
-      media {
-        image {
-          id
-          type
-          thumbnail_url
-          thumbnail_height
-          thumbnail_width
-        }
-
-        make {
-          id
-          type
-          thumbnail_url
-          thumbnail_height
-          thumbnail_width
-        }
+  query ListVehicles($page: Int, $size: Int, $search: String) {
+  vehicleList( page: $page size: $size search: $search) {
+    id
+    naming {
+      make
+      model
+      chargetrip_version
+    }
+    media {
+      image {
+        thumbnail_url
       }
     }
   }
+}
 `;
+
+
+export const GET_VEHICLE_DETAILS = gql`
+    query GetVehicleDetails($vehicleId: ID!){ 
+    vehicle(id: $vehicleId) {
+    naming {
+      make
+      model
+      chargetrip_version
+    }
+    media {
+      image {
+        url
+      }
+      brand {
+        thumbnail_url
+      }
+    }
+    battery {
+      usable_kwh
+    }
+    range {
+      best {
+        highway
+        city
+        combined
+      }
+      worst {
+        highway
+        city
+        combined
+      }
+      chargetrip_range {
+        best
+        worst
+      }
+    }
+    routing {
+      fast_charging_support
+    }
+    connectors {
+      standard
+    }
+    performance {
+      acceleration
+      top_speed
+    }
+  }
+    }
+`; 
